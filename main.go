@@ -1,9 +1,24 @@
 package main
 
 import (
+	"advisor-bot/clients/telegram"
 	"flag"
 	"log"
 )
+
+const (
+	tgBotHost = "api.telegram.org"
+)
+
+func main() {
+	tgClient := telegram.New(mustToken())
+
+	// fetcher = fetcher.New(tgClient)
+
+	// processor = processor.New(tgClient)
+
+	// consumer.Start(fetcher, processor)
+}
 
 func mustToken() string {
 	token := flag.String(
@@ -19,16 +34,4 @@ func mustToken() string {
 	}
 
 	return *token
-}
-
-func main() {
-	token := mustToken()
-
-	// tgClient = telegram.New(token)
-
-	// fetcher = fetcher.New()
-
-	// processor = processor.New()
-
-	// consumer.Start(fetcher, processor)
 }

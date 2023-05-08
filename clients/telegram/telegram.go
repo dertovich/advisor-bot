@@ -1,6 +1,8 @@
 package telegram
 
 import (
+	"advisor-bot/lib/e"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/url"
@@ -8,12 +10,23 @@ import (
 	"strconv"
 )
 
-const getUpdatesMethod = "getUpdates"
+const (
+	getUpdatesMethod  = "getUpdates"
+	sendMessageMethod = "sendMessage"
+)
 
 type Client struct {
 	host     string
 	basePath string
 	client   http.Client
+}
+
+func New(host string, token string) Client {
+	return Client{
+		host:     host,
+		basePath: newBasePath(token),
+		client:   http.Client{},
+	}
 }
 
 func newBasePath(token string) string {
@@ -37,6 +50,19 @@ func (c *Client) Updates(offset int, limit int) ([]Update, error) {
 	}
 
 	return res.Result, nil
+}
+
+func (c *Client) SendMessages(chatID int, text string) error {
+	q := url.Values{}
+	q.Add("chat_id", strconv.Itoa(chatID))
+	q.Add("text", text)
+
+	_, err := c.doRequest(sendMessageMethod, q)
+	if err != nil {
+		return e.Wrap("can't send message", err)
+	}
+
+	return nil
 }
 
 func (c *Client) doRequest(query url.Values) (data []byte, err error) {
@@ -68,16 +94,4 @@ func (c *Client) doRequest(query url.Values) (data []byte, err error) {
 	}
 
 	return body, nil
-}
-
-func (c *Client) SendMessages() {
-
-}
-
-func New(host string, token string) Client {
-	return Client{
-		host:     host,
-		basePath: newBasePath(token),
-		client:   http.Client{},
-	}
 }
